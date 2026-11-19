@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --brand-wine-950: #25040a;
+    --brand-wine-900: #3e0713;
+    --brand-wine-800: #570c1d;
+    --brand-wine-700: #701127;
+    --brand-wine-600: #8c1733;
+    --brand-wine-500: #b01f43;
+    --brand-wine-100: #fae8ed;
+    --brand-wine-50: #fdf2f5;
+
+    --font-serif-luxury: var(--font-serif), Georgia, serif;
+    --font-sans-clean: var(--font-sans), system-ui, sans-serif;
+  }
+
+  html,
+  body {
+    background-color: #f8f9fb;
+    color: #1e293b;
+    scroll-behavior: smooth;
+  }
+}
+
+/* Stable Burgundy Banner Gradient without flicker or GPU re-rasterization artifacts */
+.burgundy-banner-gradient {
+  background: linear-gradient(135deg, #2c040d 0%, #4e0a1a 35%, #701127 75%, #8c1733 100%);
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0); /* Force isolated GPU compositing layer */
+  backface-visibility: hidden;
+}
+
+/* Stable light wave decoration without heavy composite filters */
+.burgundy-banner-gradient::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 55%;
+  height: 200%;
+  background: radial-gradient(ellipse, rgba(176, 31, 67, 0.22) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+/* Bar chart diagonal stripe texture to match Daftra Qatar screenshot */
+.bar-striped-burgundy {
+  background: linear-gradient(
+    180deg,
+    #7d132d 0%,
+    #530b1c 65%,
+    #3b0612 100%
+  );
+  box-shadow: 0 10px 20px -3px rgba(87, 12, 29, 0.35);
+}
+
+/* Dash striped pattern for donut status legends */
+.pattern-dashes {
+  background-image: repeating-linear-gradient(
+    90deg,
+    currentColor,
+    currentColor 2px,
+    transparent 2px,
+    transparent 5px
+  );
+}
+
+/* Smooth Entrance Scroll Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
