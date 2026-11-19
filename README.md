@@ -1,89 +1,36 @@
-# IziFacture (AfriFacture) 🚀
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-> Plateforme SaaS de facturation et de gestion commerciale moderne pour les PME, commerces, cabinets et entrepreneurs d'Afrique Francophone (Zone FCFA • UEMOA • CEMAC).
+## Getting Started
 
----
-
-## ✨ Fonctionnalités Clés
-
-- **Monnaie & Normes Régionales** :
-  - Gestion exclusive en **Franc CFA (XOF / XAF)** avec formatage garanti sans décimales.
-  - Calcul rigoureux de la **TVA à 18%** (norme UEMOA / CEMAC).
-  - Mentions légales certifiées : NINEA, RCCM et arrêté financier en toutes lettres.
-- **Facturation Moderne & Live Preview** :
-  - Éditeur 50/50 avec synchronisation en temps réel du document papier A4.
-  - Impression vectorielle certifiée et téléchargement de factures conformes (PDF & HTML).
-  - Suivi des statuts comptables : Brouillon, Envoyée, Payée, En retard.
-- **Annuaire & Suivi Clients** :
-  - Fiche client complète avec géolocalisation et contact.
-  - Calcul automatique du statut comptable client et chiffre d'affaires cumulé.
-- **Règlements & Mobile Money** :
-  - Prise en charge des règlements Wave, Orange Money et virements bancaires (RIB).
-  - Partage et relances instantanées en 1 clic par WhatsApp.
-- **Authentification Sécurisée & Cloud Realtime** :
-  - Authentification Supabase Auth avec mot de passe fort (8 à 16 caractères).
-  - Synchronisation temps réel PostgreSQL (Supabase Database & Realtime WebSocket).
-
----
-
-## 🛠️ Stack Technique
-
-- **Framework** : [Next.js 16 (App Router + Turbopack)](https://nextjs.org/)
-- **UI & Rendu** : [React 19](https://react.dev/) + [Tailwind CSS v4](https://tailwindcss.com/)
-- **Backend & Base de données** : [Supabase](https://supabase.com/) (Auth, PostgreSQL, Realtime)
-- **Typage & Qualité** : TypeScript 5 (Strict), ESLint 9
-- **Tests** : [Vitest](https://vitest.dev/)
-- **Icônes** : [Lucide React](https://lucide.dev/)
-
----
-
-## 🚀 Démarrage Rapide
-
-### 1. Cloner le dépôt et installer les dépendances
-
-```bash
-git clone https://github.com/papychuloo/invoice_test.git
-cd invoice_test
-npm install
-```
-
-### 2. Configuration des variables d'environnement
-
-Créer un fichier `.env.local` à la racine :
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
-
-### 3. Lancer le serveur de développement
+First, run the development server:
 
 ```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-Ouvrez [http://localhost:3000](http://localhost:3000) dans votre navigateur.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
----
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## 🧪 Tests & Qualité de Code
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-```bash
-# Vérification des types TypeScript
-npm run typecheck
+## Learn More
 
-# Analyse statique du code (ESLint 9)
-npm run lint
+To learn more about Next.js, take a look at the following resources:
 
-# Lancer la suite de tests unitaires Vitest
-npm test
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-# Compiler pour la production
-npm run build
-```
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
----
+## Deploy on Vercel
 
-## 📄 Licence
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Propriété de l'auteur. Tous droits réservés.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
