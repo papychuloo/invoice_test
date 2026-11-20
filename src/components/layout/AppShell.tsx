@@ -32,7 +32,7 @@ export function AppShell({ children, currentDate }: AppShellProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, loading } = useAuth();
-  const isDashboard = pathname === "/";
+  const isDashboard = pathname === "/dashboard";
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [activeCountry, setActiveCountry] = useState<CountryConfig>(
     COUNTRIES[0] || {
@@ -49,7 +49,7 @@ export function AppShell({ children, currentDate }: AppShellProps) {
 
   // Route protection: redirect to /login if user is not authenticated
   useEffect(() => {
-    if (!loading && !user && pathname !== "/login") {
+    if (!loading && !user && pathname !== "/login" && pathname !== "/") {
       router.replace("/login");
     }
   }, [loading, user, pathname, router]);

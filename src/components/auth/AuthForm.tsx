@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Mail,
@@ -15,6 +15,7 @@ import {
   Loader2,
   ShieldCheck,
   Check,
+  Sparkles,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -24,15 +25,12 @@ const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export function AuthForm() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
-  const [mode, setMode] = useState<"login" | "signup">("login");
-
-  // If already authenticated, redirect to Dashboard
-  useEffect(() => {
-    if (!authLoading && user) {
-      router.replace("/");
-    }
-  }, [authLoading, user, router]);
+  const searchParams = useSearchParams();
+  const initialMode = searchParams.get("mode") === "signup" ? "signup" : "login";
+  const planParam = searchParams.get("plan");
+  const { user, loading: authLoading, signOut } = useAuth();
+  const [mode, setMode] = useState<"login" | "signup">(initialMode);
+  const isSigningUpRef = React.useRef(false);
 
   // Form fields
   const [fullName, setFullName] = useState("");
@@ -46,6 +44,24 @@ export function AuthForm() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // If already authenticated, redirect to Dashboard (unless currently in signup flow)
+  useEffect(() => {
+    if (!authLoading && user && !isSigningUpRef.current) {
+      router.replace("/dashboard");
+    }
+  }, [authLoading, user, router]);
+
+  const handleSwitchMode = (newMode: "login" | "signup") => {
+    setMode(newMode);
+    setFullName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    setLoading(false);
+  };
 
   // Password rules validation
   const hasLength = password.length >= 8 && password.length <= 16;
@@ -140,15 +156,13 @@ export function AuthForm() {
           return;
         }
 
-        setSuccessMessage("Connexion réussie ! Redirection en cours...");
-        setTimeout(() => {
-          setLoading(false);
-          setPassword("");
-          router.push("/");
-          router.refresh();
-        }, 600);
+        // Direct instant redirect without artificial delay or lingering text
+        setPassword("");
+        router.push("/dashboard");
+        router.refresh();
       } else {
         // Sign Up
+        isSigningUpRef.current = true;
         const { error } = await supabase.auth.signUp({
           email: email.trim().toLowerCase(),
           password,
@@ -160,12 +174,17 @@ export function AuthForm() {
         });
 
         if (error) {
+          isSigningUpRef.current = false;
           setErrorMessage(error.message);
           setLoading(false);
           return;
         }
 
-        // Do NOT auto login: switch to login mode, clear password fields, and inform user
+        // Ensure user is not auto-logged in: explicitly clear Supabase session
+        await signOut();
+        isSigningUpRef.current = false;
+
+        // Switch to login mode, keep email, clear password fields, and inform user
         setPassword("");
         setConfirmPassword("");
         setMode("login");
@@ -173,6 +192,7 @@ export function AuthForm() {
         setSuccessMessage("Votre compte a été créé avec succès ! Veuillez saisir votre mot de passe pour vous connecter.");
       }
     } catch (err: unknown) {
+      isSigningUpRef.current = false;
       const msg = err instanceof Error ? err.message : "Une erreur inattendue est survenue.";
       setErrorMessage(msg);
       setLoading(false);
@@ -255,6 +275,21 @@ export function AuthForm() {
           </p>
         </div>
 
+        {/* Selected Plan Announcement if redirected from Landing */}
+        {planParam && mode === "signup" && (
+          <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-center text-xs font-bold text-[#701127] flex items-center justify-center gap-1.5 animate-in fade-in">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>
+              Formule sélectionnée : Plan{" "}
+              {planParam === "pro"
+                ? "Pro (5 000 FCFA/mois)"
+                : planParam === "business"
+                ? "Business (15 000 FCFA/mois)"
+                : "Gratuit"}
+            </span>
+          </div>
+        )}
+
         {/* Notifications (Errors or Success) */}
         {errorMessage && (
           <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5 animate-in fade-in">
@@ -271,7 +306,7 @@ export function AuthForm() {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form key={mode} onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
           {/* Full Name field (Only in Signup mode) */}
           {mode === "signup" && (
             <div className="space-y-1.5 animate-in fade-in duration-200">
@@ -288,6 +323,7 @@ export function AuthForm() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="ex: Dr. Awa Ndiaye (Clinique Al Noor)"
+                  autoComplete="name"
                   className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 focus:border-[#701127] focus:ring-2 focus:ring-[#701127]/20 outline-none text-xs text-slate-900 placeholder-slate-400 transition-all bg-slate-50/40 focus:bg-white"
                 />
               </div>
@@ -309,6 +345,7 @@ export function AuthForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="nom@entreprise.sn"
+                autoComplete={mode === "signup" ? "off" : "email"}
                 className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 focus:border-[#701127] focus:ring-2 focus:ring-[#701127]/20 outline-none text-xs text-slate-900 placeholder-slate-400 transition-all bg-slate-50/40 focus:bg-white"
               />
             </div>
@@ -335,6 +372,7 @@ export function AuthForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
+                autoComplete={mode === "signup" ? "new-password" : "current-password"}
                 className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200/90 focus:border-[#701127] focus:ring-2 focus:ring-[#701127]/20 outline-none text-xs text-slate-900 placeholder-slate-400 transition-all bg-slate-50/40 focus:bg-white font-mono"
               />
               <button
@@ -347,8 +385,8 @@ export function AuthForm() {
               </button>
             </div>
 
-            {/* Dynamic Password Strength Indicator */}
-            {password.length > 0 && (
+            {/* Dynamic Password Strength Indicator (Only for Signup when typing) */}
+            {mode === "signup" && password.length > 0 && (
               <div className="pt-1.5 space-y-1.5 animate-in fade-in duration-150">
                 <div className="flex items-center justify-between text-[10px]">
                   <span className="text-slate-500 font-medium">Niveau de sécurité :</span>
@@ -362,23 +400,21 @@ export function AuthForm() {
                   <div className={cn("rounded-full transition-all duration-300", criteriaCount >= 4 ? strength.color : "bg-slate-200")} />
                 </div>
 
-                {/* Password Criteria Checklist (Only in signup or when typing) */}
-                {mode === "signup" && (
-                  <div className="grid grid-cols-2 gap-1 text-[10px] pt-1 text-slate-500">
-                    <span className={cn("flex items-center gap-1", hasLength ? "text-emerald-600 font-bold" : "")}>
-                      <Check className="w-3 h-3" /> 8 à 16 caractères
-                    </span>
-                    <span className={cn("flex items-center gap-1", hasUpper && hasLower ? "text-emerald-600 font-bold" : "")}>
-                      <Check className="w-3 h-3" /> Majuscule & minuscule
-                    </span>
-                    <span className={cn("flex items-center gap-1", hasNumber ? "text-emerald-600 font-bold" : "")}>
-                      <Check className="w-3 h-3" /> Au moins un chiffre
-                    </span>
-                    <span className={cn("flex items-center gap-1", hasSpecial ? "text-emerald-600 font-bold" : "")}>
-                      <Check className="w-3 h-3" /> Caractère spécial (!@#)
-                    </span>
-                  </div>
-                )}
+                {/* Password Criteria Checklist */}
+                <div className="grid grid-cols-2 gap-1 text-[10px] pt-1 text-slate-500">
+                  <span className={cn("flex items-center gap-1", hasLength ? "text-emerald-600 font-bold" : "")}>
+                    <Check className="w-3 h-3" /> 8 à 16 caractères
+                  </span>
+                  <span className={cn("flex items-center gap-1", hasUpper && hasLower ? "text-emerald-600 font-bold" : "")}>
+                    <Check className="w-3 h-3" /> Majuscule & minuscule
+                  </span>
+                  <span className={cn("flex items-center gap-1", hasNumber ? "text-emerald-600 font-bold" : "")}>
+                    <Check className="w-3 h-3" /> Au moins un chiffre
+                  </span>
+                  <span className={cn("flex items-center gap-1", hasSpecial ? "text-emerald-600 font-bold" : "")}>
+                    <Check className="w-3 h-3" /> Caractère spécial (!@#)
+                  </span>
+                </div>
               </div>
             )}
           </div>
@@ -400,6 +436,7 @@ export function AuthForm() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••••••"
+                  autoComplete="new-password"
                   className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200/90 focus:border-[#701127] focus:ring-2 focus:ring-[#701127]/20 outline-none text-xs text-slate-900 placeholder-slate-400 transition-all bg-slate-50/40 focus:bg-white font-mono"
                 />
               </div>
@@ -438,7 +475,7 @@ export function AuthForm() {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Traitement en cours...</span>
+                <span>{mode === "login" ? "Connexion en cours..." : "Création du compte..."}</span>
               </>
             ) : mode === "login" ? (
               <>
@@ -511,14 +548,7 @@ export function AuthForm() {
               Vous n&apos;avez pas encore de compte ?{" "}
               <button
                 type="button"
-                onClick={() => {
-                  setMode("signup");
-                  setPassword("");
-                  setConfirmPassword("");
-                  setLoading(false);
-                  setErrorMessage(null);
-                  setSuccessMessage(null);
-                }}
+                onClick={() => handleSwitchMode("signup")}
                 className="font-bold text-[#701127] hover:underline transition-colors"
               >
                 Créer un compte
@@ -529,14 +559,7 @@ export function AuthForm() {
               Vous avez déjà un compte ?{" "}
               <button
                 type="button"
-                onClick={() => {
-                  setMode("login");
-                  setPassword("");
-                  setConfirmPassword("");
-                  setLoading(false);
-                  setErrorMessage(null);
-                  setSuccessMessage(null);
-                }}
+                onClick={() => handleSwitchMode("login")}
                 className="font-bold text-[#701127] hover:underline transition-colors"
               >
                 Se connecter

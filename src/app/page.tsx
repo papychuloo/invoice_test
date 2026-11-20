@@ -1,6 +1,6 @@
 import React from "react";
-import { DashboardView } from "@/components/dashboard/DashboardView";
+import { LandingPage } from "@/components/landing/LandingPage";
 
-export default function DashboardPage() {
-  return <DashboardView />;
+export default function HomePage() {
+  return <LandingPage />;
 }

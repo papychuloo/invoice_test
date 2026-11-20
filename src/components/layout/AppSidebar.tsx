@@ -33,7 +33,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: "Tableau de bord", href: "/", icon: LayoutDashboard },
+  { label: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
   { label: "Factures", href: "/invoices", icon: FileText },
   { label: "Devis", href: "/quotes", icon: FileCheck2 },
   { label: "Clients", href: "/customers", icon: Users },
@@ -101,7 +101,7 @@ export function AppSidebar({ mobileOpen: controlledMobileOpen, onMobileClose }: 
         {/* Top: Brand Logo and Close button */}
         <div className="p-5 pb-3">
           <div className="flex items-center justify-between">
-            <Link href="/" onClick={handleClose} className="flex items-center gap-2.5 group">
+            <Link href="/dashboard" onClick={handleClose} className="flex items-center gap-2.5 group">
               {/* Star / Flower Burgundy Logo Icon */}
               <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#570c1d] to-[#8c1733] flex items-center justify-center text-white shadow-sm shadow-[#570c1d]/20 group-hover:scale-105 transition-transform">
                 <svg
@@ -164,8 +164,8 @@ export function AppSidebar({ mobileOpen: controlledMobileOpen, onMobileClose }: 
             <nav className="space-y-1">
               {navItems.map((item) => {
                 const isActive =
-                  item.href === "/"
-                    ? pathname === "/"
+                  item.href === "/dashboard"
+                    ? pathname === "/dashboard"
                     : pathname.startsWith(item.href);
                 const Icon = item.icon;
 

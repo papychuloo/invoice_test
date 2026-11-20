@@ -62,7 +62,38 @@ graph TD
 
 ## 3. Inventaire Exhaustif des Fonctionnalités Implémentées
 
-### A. Tableau de Bord Commercial (`/`)
+### A. Landing Page Officielle & Vitrine SaaS (`/`)
+- **Point d'Entrée Principal** : Vitrine accessible librement à tous les visiteurs, présentant l'ensemble de la valeur ajoutée d'IziFacture sans barrière d'authentification préalable.
+- **En-tête Sticky Réactif (`LandingHeader`)** :
+  - Logo IziFacture avec puce bordeaux signature.
+  - Navigation par ancres fluides (`#problemes`, `#fonctionnalites`, `#comment-ca-marche`, `#tarifs`, `#temoignages`).
+  - Détection de session active (`useAuth()`) : affiche « Accéder à mon espace » (`/dashboard`) pour les utilisateurs connectés ou les boutons « Connexion » (`/login`) et « Créer un compte » (`/login?mode=signup`).
+  - Menu tiroir mobile complet.
+- **Section Hero & Démo Applicative 50/50 (`HeroSection`)** :
+  - Badge d'annonce flottant animé : *« NOUVEAU : TVA 18% automatique & factures certifiées en Francs CFA 💸 »*.
+  - Titre à fort impact avec typographie serif dégradée bordeaux.
+  - Boutons CTAs magnétiques (`.btn-magnetic`) et signaux de confiance (sans CB, 5 factures gratuites, conformité OHADA).
+  - Maquette interactive avec cadre navigateur Safari et statut « ● En ligne » :
+    - Volet gauche : formulaire d'édition avec client sélectionné (Koffi Diop SARL), TVA 18% (+135 000 FCFA), Total TTC (885 000 FCFA).
+    - Volet droit : rendu papier A4 certifié avec en-tête, NINEA, RCCM, tableau détaillé et coordonnées Wave / Mobile Money avec QR Code.
+- **Section Problèmes du Terrain (`ProblemSection`)** :
+  - 3 cartes d'alerte avec surélévation au survol : Factures non professionnelles, Calculs manuels de TVA & erreurs, Suivi des paiements impossible.
+- **Section Fonctionnalités Phares (`FeaturesSection`)** :
+  - 4 cartes illustrées : Factures en 2 clics, TVA 18% automatique, Suivi des règlements en direct, Gestion client intégrée.
+- **Section Comment ça marche (`HowItWorksSection`)** :
+  - Parcours en 3 étapes numérotées : Inscription en 30s, Création de facture, Envoi et suivi.
+- **Section Témoignages Africains (`TestimonialsSection`)** :
+  - Avis clients certifiés d'entrepreneurs au Sénégal (Dakar), en Côte d'Ivoire (Abidjan) et au Cameroun (Douala).
+- **Section Tarification Interactive (`PricingSection`)** :
+  - Bascule mensuel / annuel (-2 mois offerts).
+  - 3 plans avec sélection active au clic : Gratuit (0 FCFA), Pro (5 000 FCFA/mois, badge mis en avant), Business (15 000 FCFA/mois).
+  - Liens de conversion contextuels transmettant le plan (`/login?mode=signup&plan=pro`).
+- **Section CTA Final & Footer (`FinalCtaSection`, `LandingFooter`)** :
+  - Halo lumineux ambiant, contact direct WhatsApp, pied de page 5 colonnes et mention *« 🌍 Fait avec fierté en Afrique »*.
+
+---
+
+### B. Tableau de Bord Commercial (`/dashboard`)
 - **Bandeau Hero Bordeaux Signature (`HeaderBanner`)** :
   - Dégradé de prestige bordeaux sombre (`linear-gradient(135deg, #2c040d 0%, #4e0a1a 35%, #701127 75%, #8c1733 100%)`).
   - Salutation personnalisée en typographie serif italique (*"Good Evening Ralph Edwards"*), date en français.
@@ -199,8 +230,11 @@ Page complète structurée en 5 onglets dédiés :
   - Trigger PostgreSQL `handle_auto_confirm_user` pour auto-confirmer immédiatement les utilisateurs.
   - Session réactive globale via `AuthProvider` (`src/lib/auth-context.tsx`).
   - **Auth Guard & Protection des routes** (`AppShell`) : Redirection automatique vers `/login` pour tout visiteur non connecté arrivant sur la racine ou rechargeant la page.
-  - **Flow d'inscription en 2 étapes** : La création d'un compte bascule l'utilisateur sur le mode « Se connecter » avec message de validation vert et email pré-rempli, sans redirection directe vers le dashboard. La connexion explicite est requise.
-  - **Déconnexion propre** : Bouton visible *« Se déconnecter »* avec icône `LogOut` dans `AppSidebar`, réinitialisant intégralement la session, vidant les mots de passe et remettant `loading` à `false` (aucun blocage sur « Traitement des données »).
+  - **Flow d'inscription en 2 étapes** : La création d'un compte invalide explicitement toute session automatique (`signOut()`), bascule le formulaire sur le mode « Se connecter » avec message de validation vert et email pré-rempli, sans redirection directe vers le dashboard. La connexion explicite est requise.
+  - **Suppression des champs indésirables & Autocomplétion contrôlée** : Balise `<form key={mode} autoComplete="off">`, champs vides par défaut, `autoComplete="new-password"` en création de compte et `autoComplete="current-password"` en connexion.
+  - **Jauge de sécurité dynamique exclusive à l'inscription** : Les barres vertes et la checklist de critères sont strictement masquées sur l'écran de connexion (`mode === "login"`). En création de compte, elles n'apparaissent qu'au moment où l'utilisateur commence activement à taper un mot de passe.
+  - **Déconnexion propre** : Bouton visible *« Se déconnecter »* avec icône `LogOut` dans `AppSidebar`, réinitialisant intégralement la session, vidant les mots de passe et supprimant tout message ou délai résiduel sur `/login`.
+  - **Connexion instantanée & Spinner sur le bouton** : Suppression de l'attente artificielle et du texte d'attente ; affichage d'un spinner animé `<Loader2>` sur le bouton principal et redirection directe vers `/dashboard` dès la confirmation Supabase.
   - **Salutation personnalisée** : Mention prestigieuse *« Bonjour, »* suivie du prénom et nom réels de l'utilisateur (`user.user_metadata.full_name`) en typographie Serif italique.
   - **Date dynamique en temps réel** : Affichage automatique de la date du jour en français (`formatFullFrenchDate(new Date())`) au format complet.
   - **Sélecteur de devise / pays fiabilisé** : Balise `<header>` élevée avec `relative z-40`, menu déroulant `z-[100]` avec défilement fluide `overscroll-contain`, listant l'intégralité des 14 pays de la zone FCFA sans être rogné par le contenu du dashboard.
@@ -229,7 +263,9 @@ invoice_test/
 │   ├── app/                            # Next.js 16 App Router
 │   │   ├── layout.tsx                  # Root Layout (polices Geist Sans, Serif et AuthProvider)
 │   │   ├── globals.css                 # Import Tailwind CSS v4, dégradés bordeaux et scrollbars
-│   │   ├── page.tsx                    # Page Dashboard (Route `/`)
+│   │   ├── page.tsx                    # Landing Page Officielle & Vitrine SaaS (Route `/`)
+│   │   ├── dashboard/
+│   │   │   └── page.tsx                # Tableau de Bord Commercial Authentifié (Route `/dashboard`)
 │   │   ├── login/
 │   │   │   └── page.tsx                # Page Connexion & Inscription moderne (Route `/login`)
 │   │   ├── settings/
@@ -246,6 +282,18 @@ invoice_test/
 │   │               └── page.tsx        # Page Modifier Facture (Route `/invoices/[id]/edit`)
 │   │
 │   ├── components/
+│   │   ├── landing/                    # Composants de la Landing Page Officielle
+│   │   │   ├── LandingPage.tsx         # Orchestrateur, scroll reveal et effet magnétique
+│   │   │   ├── LandingHeader.tsx       # En-tête sticky responsive, navigation par ancres et détection session
+│   │   │   ├── HeroSection.tsx         # Hero percutant avec badge animé et maquette 50/50 live
+│   │   │   ├── ProblemSection.tsx      # 3 constats du terrain
+│   │   │   ├── FeaturesSection.tsx     # 4 cartes de fonctionnalités clés
+│   │   │   ├── HowItWorksSection.tsx   # Parcours en 3 étapes numérotées
+│   │   │   ├── TestimonialsSection.tsx # Témoignages clients (Dakar, Abidjan, Douala)
+│   │   │   ├── PricingSection.tsx      # 3 plans tarifaires avec sélection active
+│   │   │   ├── FinalCtaSection.tsx     # Bannière finale de conversion avec WhatsApp
+│   │   │   └── LandingFooter.tsx       # Pied de page en 5 colonnes
+│   │   │
 │   │   ├── auth/                       # Authentification & Inscription
 │   │   │   └── AuthForm.tsx            # Formulaire moderne avec jauge de force, RFC email & Supabase Auth
 │   │   │

@@ -126,7 +126,7 @@ export function SubpageHeader({
     }
     return {
       section: "Espace de travail",
-      sectionHref: "/",
+      sectionHref: "/dashboard",
       page: "Page",
       icon: Home,
     };
@@ -154,7 +154,7 @@ export function SubpageHeader({
           {/* Breadcrumb pills */}
           <nav aria-label="Fil d'Ariane" className="flex items-center gap-1.5 text-xs">
             <Link
-              href="/"
+              href="/dashboard"
               className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
               title="Tableau de bord"
             >
